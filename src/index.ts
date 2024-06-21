@@ -34,33 +34,7 @@ function buildLibsqlClient(env: Env): LibsqlClient {
 function buildRouter(env: Env) {
     const router = Router();
     
-    router.get("/:id",  async (request) => {
-        const client = buildLibsqlClient(env);
-        const id = request.params.id;
-        const rs = await client.execute("select * from images_dataset where id = " + id);
-        return Response.json(rs, { status: 200 });
-    });
 
-    router.get("/:id/image",  async (request) => {
-        const client = buildLibsqlClient(env);
-        const id = request.params.id;
-        const rs = await client.execute("select image_base64 from images_dataset where id = " + id);
-        return Response.json(rs, { status: 200 });
-    });
-
-    router.get("/:id/mask",  async (request) => {
-        const client = buildLibsqlClient(env);
-        const id = request.params.id;
-        const rs = await client.execute("select mask_base64 from images_dataset where id = " + id);
-        return Response.json(rs, { status: 200 });
-    });
-    
-    router.get("/:id/cmap",  async (request) => {
-        const client = buildLibsqlClient(env);
-        const id = request.params.id;
-        const rs = await client.execute("select cmap_base64 from images_dataset where id = " + id);
-        return Response.json(rs, { status: 200 });
-    });
 
     router.get("/random/image",  async (request) => {
         const client = buildLibsqlClient(env);
@@ -92,7 +66,35 @@ function buildRouter(env: Env) {
         return Response.json(rs, { status: 200 });
     });
 
- 
+    router.get("/:id",  async (request) => {
+        const client = buildLibsqlClient(env);
+        const id = request.params.id;
+        const rs = await client.execute("select * from images_dataset where id = " + id);
+        return Response.json(rs, { status: 200 });
+    });
+
+    router.get("/:id/image",  async (request) => {
+        const client = buildLibsqlClient(env);
+        const id = request.params.id;
+        const rs = await client.execute("select image_base64 from images_dataset where id = " + id);
+        return Response.json(rs, { status: 200 });
+    });
+
+    router.get("/:id/mask",  async (request) => {
+        const client = buildLibsqlClient(env);
+        const id = request.params.id;
+        const rs = await client.execute("select mask_base64 from images_dataset where id = " + id);
+        return Response.json(rs, { status: 200 });
+    });
+    
+    router.get("/:id/cmap",  async (request) => {
+        const client = buildLibsqlClient(env);
+        const id = request.params.id;
+        const rs = await client.execute("select cmap_base64 from images_dataset where id = " + id);
+        return Response.json(rs, { status: 200 });
+    });
+
+
     router.all("*", () => new Response("Not Found.", { status: 404 }));
 
     return router;
