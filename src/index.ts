@@ -39,27 +39,38 @@ function buildLibsqlClient(env: Env): LibsqlClient {
 function buildRouter(env: Env) {
     const router = Router();
     
-    router.get("/parse_jwt/:token",  async (request) => {
+
+    router.get("/parse_jwt/user_data/:token",  async (request) => {
         // const token = request.params.token;
         // console.log(token);
-        console.dir(request)
         const token =  request.params.token
         // const decoded = decode(token);
+        const parts = token.split('.');
+        const payload = decode(parts[1]);
+
+        const parsed = JSON.parse(payload);
+        const email = parsed['email'];
+        const country = parsed['country'];
+        return Response.json({ email, country }, { status: 200 });
+
+    });
+
+
+    router.get("/parse_jwt/:token",  async (request) => {
+
+        const token =  request.params.token
+
         const parts = token.split('.');
         const header = decode(parts[0]);
         const payload = decode(parts[1]);
         // const signature = atob(parts[2].replace(/_/g, '/').replace(/-/g, '+'));
-        console.log(payload)
-        // return {
-        //   header: header,
-        //   payload: payload,
-        //   signature: signature,
-        //   raw: { header: parts[0], payload: parts[1], signature: parts[2] }
-        // }
+
 
         return Response.json({ header: header, payload: payload }, { status: 200 });
 
     });
+
+
 
 
     router.get("/random/image",  async () => {
