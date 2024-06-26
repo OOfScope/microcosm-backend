@@ -73,60 +73,65 @@ function buildRouter(env: Env) {
 
 
 
-    router.get("/random/image",  async () => {
+    router.get("/get/high/random/image",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select image_base64 from images_dataset order by RANDOM() limit 1");
         return Response.json(rs, { status: 200 });
     });        
 
-    router.get("/random/mask",  async () => {
+    router.get("/get/high/random/mask",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select mask_base64 from images_dataset order by RANDOM() limit 1");
         return Response.json(rs, { status: 200 });
     });        
 
-    router.get("/random/cmap",  async () => {
+    router.get("/get/high/random/cmap",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select cmap_base64 from images_dataset order by RANDOM() limit 1");
         return Response.json(rs, { status: 200 });
     });
         
-    router.get("/random",  async () => {
+    router.get("/get/high/random",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select * from images_dataset order by RANDOM() limit 1");
         return Response.json(rs, { status: 200 });
     });
         
-    router.get("/count",  async () => {
+    router.get("/high/count",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select count(id) from images_dataset");
         return Response.json(rs, { status: 200 });
     });
 
+    router.get("/low/count",  async () => {
+        const client = buildLibsqlClient(env);
+        const rs = await client.execute("select count(id) from low_images_dataset");
+        return Response.json(rs, { status: 200 });
+    });
 
 
-    router.get("/:id/image",  async (request) => {
+    router.get("/get/high/:id/image",  async (request) => {
         const client = buildLibsqlClient(env);
         const id = request.params.id;
         const rs = await client.execute("select image_base64 from images_dataset where id = " + id);
         return Response.json(rs, { status: 200 });
     });
 
-    router.get("/:id/mask",  async (request) => {
+    router.get("/get/high/:id/mask",  async (request) => {
         const client = buildLibsqlClient(env);
         const id = request.params.id;
         const rs = await client.execute("select mask_base64 from images_dataset where id = " + id);
         return Response.json(rs, { status: 200 });
     });
     
-    router.get("/:id/cmap",  async (request) => {
+    router.get("/get/high/:id/cmap",  async (request) => {
         const client = buildLibsqlClient(env);
         const id = request.params.id;
         const rs = await client.execute("select cmap_base64 from images_dataset where id = " + id);
         return Response.json(rs, { status: 200 });
     });
-
-    router.get("/:id",  async (request) => {
+    
+    router.get("/get/high/:id",  async (request) => {
         const client = buildLibsqlClient(env);
         const id = request.params.id;
         const rs = await client.execute("select * from images_dataset where id = " + id);
@@ -134,6 +139,65 @@ function buildRouter(env: Env) {
     });
 
 
+
+    router.get("/get/low/:id/image",  async (request) => {
+        const client = buildLibsqlClient(env);
+        const id = request.params.id;
+        const rs = await client.execute("select image_base64 from low_images_dataset where id = " + id);
+        return Response.json(rs, { status: 200 });
+    });
+
+    router.get("/get/low/:id/mask",  async (request) => {
+        const client = buildLibsqlClient(env);
+        const id = request.params.id;
+        const rs = await client.execute("select mask_base64 from low_images_dataset where id = " + id);
+        return Response.json(rs, { status: 200 });
+    });
+    
+    router.get("/get/low/:id/cmap",  async (request) => {
+        const client = buildLibsqlClient(env);
+        const id = request.params.id;
+        const rs = await client.execute("select cmap_base64 from low_images_dataset where id = " + id);
+        return Response.json(rs, { status: 200 });
+    });
+    router.get("/get/low/random/image",  async () => {
+        const client = buildLibsqlClient(env);
+        const rs = await client.execute("select image_base64 from low_images_dataset order by RANDOM() limit 1");
+        return Response.json(rs, { status: 200 });
+    });        
+
+    router.get("/get/low/random/mask",  async () => {
+        const client = buildLibsqlClient(env);
+        const rs = await client.execute("select mask_base64 from low_images_dataset order by RANDOM() limit 1");
+        return Response.json(rs, { status: 200 });
+    });        
+
+    router.get("/get/low/random/cmap",  async () => {
+        const client = buildLibsqlClient(env);
+        const rs = await client.execute("select cmap_base64 from low_images_dataset order by RANDOM() limit 1");
+        return Response.json(rs, { status: 200 });
+    });
+        
+
+    router.get("/get/low/random",  async () => {
+        const client = buildLibsqlClient(env);
+        const rs = await client.execute("select * from low_images_dataset order by RANDOM() limit 1");
+        return Response.json(rs, { status: 200 });
+    });
+
+    router.get("/get/low/:id",  async (request) => {
+        const client = buildLibsqlClient(env);
+        const id = request.params.id;
+        const rs = await client.execute("select * from low_images_dataset where id = " + id);
+    });
+
+
+
+    router.get("/",  async () => {
+
+        const rs = 'Welcome in the Microcosm Backend :)'
+        return Response.json(rs, { status: 200 });
+    });
 
 
     router.all("*", () => new Response("Not Found.", { status: 404 }));
