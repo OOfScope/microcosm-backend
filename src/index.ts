@@ -4,15 +4,9 @@ import { encode, decode } from "@cfworker/base64url"
 
 const { preflight, corsify } = cors({
     // origin: '*',
-    // origin: true,
-    // origin: 'https://foo.bar',
-    // origin: ['https://foo.bar', 'https://dog.cat'],
     origin: /^[a-z]+\.gmichele\.com$/,
-    // origin: (origin) => origin.endsWith('gmichele.com') ? origin : undefined,
     credentials: true,
-    allowMethods: '*',
-    // allowMethods: 'GET, POST',
-    // allowMethods: ['GET', 'POST'],
+    allowMethods: ['GET'],
     maxAge: 84600,
   })
 
