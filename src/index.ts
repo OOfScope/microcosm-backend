@@ -3,8 +3,9 @@ import { AutoRouter, Router, RouterType, cors, error, json } from "itty-router";
 import { encode, decode } from "@cfworker/base64url"
 
 const { preflight, corsify } = cors({
-    // origin: '*',
-    origin: /^[a-z]+\.gmichele\.com$/,
+    //origin: '*',
+    // origin: /^[a-z]+\.gmichele\.com$/,
+    origin: (o) => o.endsWith('gmichele.com') ? o : undefined,
     credentials: true,
     allowMethods: ['GET'],
     maxAge: 84600,
