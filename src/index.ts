@@ -1,6 +1,20 @@
 import { Client as LibsqlClient, createClient } from "@libsql/client/web";
-import { Router, RouterType } from "itty-router";
+import { AutoRouter, Router, RouterType, cors, error, json } from "itty-router";
 import { encode, decode } from "@cfworker/base64url"
+
+const { preflight, corsify } = cors({
+    // origin: '*',
+    // origin: true,
+    // origin: 'https://foo.bar',
+    // origin: ['https://foo.bar', 'https://dog.cat'],
+    origin: /^[a-z]+\.gmichele\.com$/,
+    // origin: (origin) => origin.endsWith('gmichele.com') ? origin : undefined,
+    credentials: true,
+    allowMethods: '*',
+    // allowMethods: 'GET, POST',
+    // allowMethods: ['GET', 'POST'],
+    maxAge: 84600,
+  })
 
 
 export interface Env {
@@ -14,7 +28,7 @@ export default {
         if (env.router === undefined) {
             env.router = buildRouter(env);
         }
-        return env.router.handle(request);
+        return env.router.fetch(request);
     },
 } satisfies ExportedHandler<Env>;
 
@@ -36,14 +50,16 @@ function buildLibsqlClient(env: Env): LibsqlClient {
 
 
 
-function buildRouter(env: Env) {
-    const router = Router();
+function buildRouter(env: Env) : RouterType {
+
+    const router = AutoRouter({
+        before: [preflight],
+        finally: [json, corsify],
+    });
     
 
-    router.get("/parse_jwt/user_data/:token",  async (request) => {
-        // const token = request.params.token;
-        // console.log(token);
-        const token =  request.params.token
+    router.get("/parse_jwt/user_data/:token",  async ({token}) => {
+        
         // const decoded = decode(token);
         const parts = token.split('.');
         const payload = decode(parts[1]);
@@ -51,7 +67,7 @@ function buildRouter(env: Env) {
         const parsed = JSON.parse(payload);
         const email = parsed['email'];
         const country = parsed['country'];
-        return Response.json({ email, country }, { status: 200 });
+        return { email, country };
 
     });
 
@@ -65,144 +81,132 @@ function buildRouter(env: Env) {
         const payload = decode(parts[1]);
         // const signature = atob(parts[2].replace(/_/g, '/').replace(/-/g, '+'));
 
-
-        return Response.json({ header: header, payload: payload }, { status: 200 });
+        return { header, payload };
 
     });
-
 
 
 
     router.get("/get/high/random/image",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select image_base64 from images_dataset order by RANDOM() limit 1");
-        return Response.json(rs, { status: 200 });
+        return rs;
     });        
 
     router.get("/get/high/random/mask",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select mask_base64 from images_dataset order by RANDOM() limit 1");
-        return Response.json(rs, { status: 200 });
+        return rs;
     });        
 
     router.get("/get/high/random/cmap",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select cmap_base64 from images_dataset order by RANDOM() limit 1");
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
         
     router.get("/get/high/random",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select * from images_dataset order by RANDOM() limit 1");
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
         
     router.get("/high/count",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select count(id) from images_dataset");
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
 
     router.get("/low/count",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select count(id) from low_images_dataset");
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
 
     router.get("/get/low/random/image",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select image_base64 from low_images_dataset order by RANDOM() limit 1");
-        return Response.json(rs, { status: 200 });
+        return rs;
     });        
 
     router.get("/get/low/random/mask",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select mask_base64 from low_images_dataset order by RANDOM() limit 1");
-        return Response.json(rs, { status: 200 });
+        return rs;
     });        
 
     router.get("/get/low/random/cmap",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select cmap_base64 from low_images_dataset order by RANDOM() limit 1");
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
         
 
     router.get("/get/low/random",  async () => {
         const client = buildLibsqlClient(env);
         const rs = await client.execute("select * from low_images_dataset order by RANDOM() limit 1");
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
 
 
-    router.get("/get/high/:id/image",  async (request) => {
+    router.get("/get/high/:id/image",  async ({id}) => {
         const client = buildLibsqlClient(env);
-        const id = request.params.id;
         const rs = await client.execute("select image_base64 from images_dataset where id = " + id);
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
 
-    router.get("/get/high/:id/mask",  async (request) => {
+    router.get("/get/high/:id/mask",  async ({id}) => {
         const client = buildLibsqlClient(env);
-        const id = request.params.id;
         const rs = await client.execute("select mask_base64 from images_dataset where id = " + id);
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
     
-    router.get("/get/high/:id/cmap",  async (request) => {
+    router.get("/get/high/:id/cmap",  async ({id}) => {
         const client = buildLibsqlClient(env);
-        const id = request.params.id;
         const rs = await client.execute("select cmap_base64 from images_dataset where id = " + id);
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
     
-    router.get("/get/high/:id",  async (request) => {
+    router.get("/get/high/:id",  async ({id}) => {
         const client = buildLibsqlClient(env);
-        const id = request.params.id;
         const rs = await client.execute("select * from images_dataset where id = " + id);
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
 
 
 
-    router.get("/get/low/:id/image",  async (request) => {
+    router.get("/get/low/:id/image",  async ({id}) => {
         const client = buildLibsqlClient(env);
-        const id = request.params.id;
         const rs = await client.execute("select image_base64 from low_images_dataset where id = " + id);
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
 
-    router.get("/get/low/:id/mask",  async (request) => {
+    router.get("/get/low/:id/mask",  async ({id}) => {
         const client = buildLibsqlClient(env);
-        const id = request.params.id;
         const rs = await client.execute("select mask_base64 from low_images_dataset where id = " + id);
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
     
-    router.get("/get/low/:id/cmap",  async (request) => {
+    router.get("/get/low/:id/cmap",  async ({id}) => {
         const client = buildLibsqlClient(env);
-        const id = request.params.id;
         const rs = await client.execute("select cmap_base64 from low_images_dataset where id = " + id);
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
 
 
-    router.get("/get/low/:id",  async (request) => {
+    router.get("/get/low/:id", async ({id}) => {
         const client = buildLibsqlClient(env);
-        const id = request.params.id;
         const rs = await client.execute("select * from low_images_dataset where id = " + id);
+        return rs;
     });
 
 
 
     router.get("/",  async () => {
-
         const rs = 'Welcome in the Microcosm Backend :)'
-        return Response.json(rs, { status: 200 });
+        return rs;
     });
 
-
-    router.all("*", () => new Response("Not Found.", { status: 404 }));
 
     return router;
 }
